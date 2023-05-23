@@ -1,13 +1,12 @@
 from flask import Flask
 from flask_restful import Api
 from app.config import Config
-from app.commands import add_admin_command, init_db_command
-from app.extensions import db, migrate, jwt
-from app.resource.auth import UserResource, LoginResource
-# from app.resource.url_shortener import UrlResource
+from app.commands import init_db_command
+from app.extensions import db, migrate
+from app.resource import UrlResource
 
 
-COMMANDS = [init_db_command, add_admin_command]
+COMMANDS = [init_db_command]
 
 
 def create_app():
@@ -23,9 +22,7 @@ def create_app():
 
 def register_api(app):
     api = Api(app)
-    api.add_resource(UserResource, '/register')
-    api.add_resource(LoginResource, '/login')
-    # api.add_resource(UserResource, '/pico/<changed>', '/change')
+    api.add_resource(UrlResource, '/', '/<string:short_url>')
 
 
 def register_extensions(app):
@@ -35,9 +32,6 @@ def register_extensions(app):
 
     # Setup Flask-Migrate
     migrate.init_app(app, db)
-
-    # Setup Flask-JWT-Extended
-    jwt.init_app(app)
 
 
 def register_commands(app):
