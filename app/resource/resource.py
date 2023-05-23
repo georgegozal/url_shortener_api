@@ -1,10 +1,14 @@
 from flask import Blueprint, request, jsonify
+from flask_restful import Resource, reqparse
 from app.extensions import db
 from app.config import get_random
-from .models import UrlShort
+from ..models import UrlShort
 
 
-api = Blueprint('api', __name__, template_folder='templates/api')
+
+
+
+
 
 
 # add url to database

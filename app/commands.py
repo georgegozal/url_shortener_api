@@ -2,7 +2,7 @@ import click
 from flask.cli import with_appcontext
 from werkzeug.security import generate_password_hash
 from app.extensions import db
-from app.auth.models import User
+from app.models import User
 
 
 def init_db():
