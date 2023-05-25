@@ -4,7 +4,7 @@
 # you can see my app on pythonanywhere
 > http://g2gozal.pythonanywhere.com/
 
-> GET https://base_url/<string>: "Redirects to the original URL
+> GET https://base_url/\<string>: "Redirects to the original URL
 
 > POST https://base_url/: "Creates a shortened URL. Send data as JSON: {"url": "https://www.example.com"}
 
