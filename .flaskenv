@@ -1,0 +1,3 @@
+FLASK_APP=main
+FLASK_DEBUG=False
+SECRET_KEY=supre_secret_key

@@ -4,7 +4,6 @@ import tempfile
 import pytest
 from app import create_app
 from app.commands import init_db
-from app.config import PROJECT_ROOT
 
 
 @pytest.fixture
@@ -14,14 +13,13 @@ def app():
     app = create_app()
     app.config.update(
         {
-        'TESTING': True,
-        'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + db_path + '.sqlite',
-        'WTF_CSRF_ENABLED': False
-    })
+            'TESTING': True,
+            'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + db_path + '.sqlite',
+            'WTF_CSRF_ENABLED': False
+        })
 
     with app.app_context():
         init_db()
-        # add_admin()
 
     yield app
 

@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restful import Api
 from app.config import Config
 from app.commands import init_db_command
-from app.extensions import db, migrate
+from app.extensions import db
 from app.resource import UrlResource
 
 
@@ -29,9 +29,6 @@ def register_extensions(app):
 
     # Setup Flask-SQLAlchemy
     db.init_app(app)
-
-    # Setup Flask-Migrate
-    migrate.init_app(app, db)
 
 
 def register_commands(app):
