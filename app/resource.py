@@ -24,7 +24,7 @@ class UrlResource(Resource):
                 'message': 'Welcome to the URL Shortener API',
                 'endpoints': {
                     'GET https://base_url/<string>': 'Redirects to the original URL',
-                    'POST https://base_url/': 'Creates a shortened URL. Send data as JSON: { "url": "https://www.example.com" }'
+                    'POST https://base_url/': 'Creates a shortened URL. Send data as JSON: {"url": "https://www.example.com"}'
                 }
             }
             return docs, 200
