@@ -1,22 +1,27 @@
 FROM python:3.10.7-alpine3.16
 
-RUN mkdir /usr/src/flask_url_shortener
-WORKDIR /usr/src/flask_url_shortener
+RUN mkdir /usr/src/app
+WORKDIR /usr/src/app
 
-# set environment variables
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt .
+
+ENV FLASK_APP=main.py
+ENV FLASK_ENV=production
+
+COPY ./requirements.txt /usr/src/app/requirements.txt
+
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# copy everything to the flask_app directory
-COPY . . 
+# EXPOSE 5000
 
-ENV FLASK_APP=app \
-    FLASK_ENV=production
+# copy project
+COPY . /usr/src/app/
 
-EXPOSE 5000
+COPY gunicorn.sh /usr/src/app/gunicorn.sh
+RUN chmod +x /usr/src/app/gunicorn.sh
 
-# CMD ["flask", "run", "--host=0.0.0.0"] 
-CMD ["python", "app.py"]
+ENTRYPOINT ["/usr/src/flask_url_shortener/gunicorn.sh"]
