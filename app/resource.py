@@ -4,12 +4,14 @@ from datetime import datetime
 
 from flask import redirect, request
 from flask_restful import Resource, reqparse
+from urllib.parse import urljoin
 
 from app.extensions import db
 from app.models import UrlModel
 
 
 class UrlResource(Resource):
+    # decorators = [cross_origin]
     parser = reqparse.RequestParser()
     parser.add_argument(
         'url',
@@ -18,60 +20,54 @@ class UrlResource(Resource):
         help="This field cannot be blank."
     )
 
-    def get(self, short_url=None):
-        if short_url is None:
-            docs = {
-                'message': 'Welcome to the URL Shortener API',
-                'endpoints': {
-                    'GET https://base_url/<string>': 'Redirects to the original URL',
-                    'POST https://base_url/': 'Creates a shortened URL. Send data as JSON: {"url": "https://www.example.com"}'
-                }
-            }
-            return docs, 200
-
+    def get(self, short_url):
+        # check and update database, remove old rows
+        UrlResource.filter_database(short_url)
+        short_url = UrlModel.query.filter_by(shortened_url=short_url).first()
+        if short_url:
+            short_url.used += 1
+            db.session.commit()
+            return redirect(short_url.original_url, 302)
         else:
-            # check and update database, remove old rows
-            UrlResource.filter_database(short_url)
-            short_url = UrlModel.query.filter_by(shortened_url=short_url).first()
-            # print(short_url)
-            if short_url:
-                short_url.used += 1
-                db.session.commit()
-                return redirect(short_url.original_url, 302)
-            else:
-                return {
-                    "status": "error",
-                    "message": "Url not found"
-                }, 404
+            return {
+                "status": "error",
+                "message": "Url not found",
+                "request_url": urljoin(request.url, short_url)
+            }, 404
 
     def post(self):
         data = UrlResource.parser.parse_args()
         original_url = data['url']
         check_url = UrlModel.query.filter_by(original_url=original_url).first()
         if check_url:
+            print(urljoin(request.url, check_url.shortened_url))
+            print(request.url + check_url.shortened_url)
+            print(request.url)
             return {
                 "status": "error",
                 "message": "Url already exists",
-                "result": request.url + check_url.shortened_url
+                "result": urljoin(request.url, check_url.shortened_url)
             }, 409
 
-        # get random sufix
+        # get random suffix
         while True:
             shortened_url = UrlResource.get_random()
-            check_sufix = UrlModel.query.filter_by(shortened_url=shortened_url).first()
-            if not check_sufix:
+            check_suffix = UrlModel.query.filter_by(shortened_url=shortened_url).first()
+            if not check_suffix:
                 break
-        # add new urls in database model
+
+        # add new URLs in the database model
         new_shortened_url = UrlModel()
         new_shortened_url.create(
             original_url=original_url,
             shortened_url=shortened_url,
         )
         new_shortened_url.save()
+
         return {
             "status": "success",
             "message": "Shortened URL created successfully",
-            "result": request.url + shortened_url
+            "result": urljoin(request.url, shortened_url)
         }, 201
 
     @staticmethod
@@ -84,6 +80,9 @@ class UrlResource(Resource):
 
     @staticmethod
     def get_random():
-        alfabet = string.ascii_lowercase
+        alphabet = string.ascii_lowercase
         nums = "0123456789" * 2
-        return ''.join(random.choices(alfabet + nums, k=5))
+        return ''.join(random.choices(alphabet + nums, k=5))
+
+    def as_postman_url(self, url):
+        return quote(url, safe=':/')
