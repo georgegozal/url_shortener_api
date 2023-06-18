@@ -1,6 +1,8 @@
 def test_home(client):
     response = client.get("/")
-    assert response.status_code == 200
+    # redirected to /swagger
+    assert response.status_code == 302
+    assert response.location.endswith('/swagger')
 
 
 def test_wrong_url(client):

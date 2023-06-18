@@ -20,7 +20,9 @@ class UrlResource(Resource):
         help="This field cannot be blank."
     )
 
-    def get(self, short_url):
+    def get(self, short_url=None):
+        if short_url is None:
+            return redirect('/swagger', 302)
         # check and update database, remove old rows
         UrlResource.filter_database(short_url)
         short_url = UrlModel.query.filter_by(shortened_url=short_url).first()
@@ -40,9 +42,6 @@ class UrlResource(Resource):
         original_url = data['url']
         check_url = UrlModel.query.filter_by(original_url=original_url).first()
         if check_url:
-            print(urljoin(request.url, check_url.shortened_url))
-            print(request.url + check_url.shortened_url)
-            print(request.url)
             return {
                 "status": "error",
                 "message": "Url already exists",
@@ -83,6 +82,3 @@ class UrlResource(Resource):
         alphabet = string.ascii_lowercase
         nums = "0123456789" * 2
         return ''.join(random.choices(alphabet + nums, k=5))
-
-    def as_postman_url(self, url):
-        return quote(url, safe=':/')

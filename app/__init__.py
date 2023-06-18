@@ -23,7 +23,7 @@ def create_app():
 
 def register_api(app):
     api = Api(app)
-    api.add_resource(UrlResource, '/api/url/', '/api/url/<string:short_url>')
+    api.add_resource(UrlResource, '/', '/<string:short_url>')
 
 
 def register_extensions(app):
@@ -31,13 +31,15 @@ def register_extensions(app):
     # Setup Flask-SQLAlchemy
     db.init_app(app)
 
+
 def register_commands(app):
 
     for command in COMMANDS:
         app.cli.add_command(command)
 
+
 def register_swagger(app):
-    SWAGGER_URL = ''
+    SWAGGER_URL = '/swagger'
     API_URL = '/static/swagger.json'
     SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
         SWAGGER_URL,

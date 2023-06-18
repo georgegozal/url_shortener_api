@@ -13,7 +13,7 @@
         }
     },
     "paths": {
-        "/api/url": {
+        "/": {
             "post": {
                 "summary": "Creates a shortened URL",
                 "requestBody": {
